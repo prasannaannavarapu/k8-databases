@@ -1,0 +1,5 @@
+deployment:
+  replicas: 1
+  imageVersion: v1
+hpa:                      #Horigental pod increarse based on traffic.
+  averageUtilization: 70

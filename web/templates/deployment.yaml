@@ -1,0 +1,42 @@
+apiVersion: apps/v1   # Now creating deploymnet
+kind: Deployment
+metadata:
+  name: web
+  namespace: roboshop
+  labels:                  #These labels are deploymnet labels
+    app: web
+    project: roboshop
+    tier: web               
+# Creating the Replica
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    matchLabels:             # These labels are used to find the pods
+        app: web
+        project: roboshop
+        tier: web           
+# Pod creation
+  template:
+    metadata:
+      labels:              #These labels are Pod labels
+        app: web
+        project: roboshop
+        tier: web           # Pod definition,  Pod is a subset of deploymnet
+ #Conatiner creation       
+    spec:
+      containers:
+      - name: web
+        image: "prasannaannavarapu/web:{{ .Values.deployment.imageVersion }}"
+        imagePullPolicy: Always
+        volumeMounts:            #The volumeMounts section mounts the nginx.conf file from the ConfigMap into the container at /etc/nginx/nginx.conf
+          - name: nginx-config   #The subPath field ensures that only the nginx.conf file is mounted, not the entire ConfigMap.
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+            readOnly: true
+      volumes:
+      - name: nginx-config
+        configMap: 
+          name: web
+          items:
+            - key: nginx.conf
+              path: nginx.conf
